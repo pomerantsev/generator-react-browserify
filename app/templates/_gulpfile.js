@@ -45,7 +45,7 @@ function getCommonScriptsTransform (opts) {
     entries: [basePaths.src + folders.scripts + '/app.jsx'],
     debug: opts.debug
   }).transform('reactify')
-    .transform('babelify')
+    .transform('babelify', {stage: 1})
     .bundle();
 }
 
