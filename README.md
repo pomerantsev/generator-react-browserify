@@ -24,7 +24,9 @@ Then, to create a project using the generator:
 Tasks
 -----
 `gulp` (default) - builds the project for use in development, starts a server on `http://localhost:9000`, and watches all source files for changes.
+
 `gulp build:prod` - builds the production version of the project (minified, no sourcemaps)
+
 `gulp connect:prod` - starts a server for the production build. Only to check if everything's fine with the production version. Does not watch and rebuild files.
 
 Enjoy!
