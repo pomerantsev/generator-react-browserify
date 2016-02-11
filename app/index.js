@@ -1,6 +1,6 @@
 var yeoman = require('yeoman-generator');
 
-module.exports = yeoman.generators.Base.extend({
+module.exports = yeoman.Base.extend({
   prompting: {
     promptName: function () {
       var done = this.async();
@@ -16,22 +16,45 @@ module.exports = yeoman.generators.Base.extend({
   },
   configuring: {
     copyFiles: function () {
-      this.template('_package.json', 'package.json', {
-        projectName: this.projectName
-      });
-      this.copy('_gulpfile.js', 'gulpfile.js');
-      this.copy('_.gitignore', '.gitignore');
-      this.copy('_.jshintrc', '.jshintrc');
-
-      this.mkdir('app');
-      this.template('app/_index.html', 'app/index.html');
-      this.mkdir('app/styles');
-      this.copy('app/styles/_main.scss', 'app/styles/main.scss');
-      this.copy('app/styles/__base.scss', 'app/styles/_base.scss');
-      this.mkdir('app/scripts');
-      this.copy('app/scripts/_app.jsx', 'app/scripts/app.jsx', {
-        projectName: this.projectName
-      });
+      this.fs.copyTpl(
+        this.templatePath('_package.json'),
+        this.destinationPath('package.json'),
+        {projectName: this.projectName}
+      );
+      this.fs.copy(
+        this.templatePath('_gulpfile.js'),
+        this.destinationPath('gulpfile.js')
+      );
+      this.fs.copy(
+        this.templatePath('_.gitignore'),
+        this.destinationPath('.gitignore')
+      );
+      this.fs.copy(
+        this.templatePath('_.eslintrc.yml'),
+        this.destinationPath('.eslintrc.yml')
+      );
+      this.fs.copyTpl(
+        this.templatePath('src/_index.html'),
+        this.destinationPath('src/index.html'),
+        {projectName: this.projectName}
+      );
+      this.fs.copy(
+        this.templatePath('src/styles/_main.scss'),
+        this.destinationPath('src/styles/main.scss')
+      );
+      this.fs.copy(
+        this.templatePath('src/styles/__base.scss'),
+        this.destinationPath('src/styles/_base.scss')
+      );
+      this.fs.copy(
+        this.templatePath('src/scripts/_index.jsx'),
+        this.destinationPath('src/scripts/index.jsx')
+      );
+      this.fs.copyTpl(
+        this.templatePath('src/scripts/components/_app.jsx'),
+        this.destinationPath('src/scripts/components/app.jsx'),
+        {projectName: this.projectName}
+      );
     }
   },
   install: function () {

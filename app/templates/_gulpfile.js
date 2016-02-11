@@ -1,14 +1,15 @@
 'use strict';
 
-var gulp = require('gulp'),
-    $ = require('gulp-load-plugins')(),
-    browserify = require('browserify'),
-    source = require('vinyl-source-stream'),
-    buffer = require('vinyl-buffer'),
-    notifier = require('node-notifier'),
-    runSequence = require('run-sequence');
+const gulp = require('gulp'),
+  $ = require('gulp-load-plugins')(),
+  del = require('del'),
+  browserify = require('browserify'),
+  source = require('vinyl-source-stream'),
+  buffer = require('vinyl-buffer'),
+  notifier = require('node-notifier'),
+  runSequence = require('run-sequence');
 
-var notify = function (error) {
+const notify = error => {
   notifier.notify({
     title: error.plugin,
     message: error.message
@@ -16,12 +17,12 @@ var notify = function (error) {
   console.error(error);
 };
 
-var basePaths = {
-  src: './app/',
+const basePaths = {
+  src: './src/',
   dest: './dist/'
 };
 
-var folders = {
+const folders = {
   scripts: 'scripts',
   styles: 'styles',
   images: 'images'
@@ -31,27 +32,27 @@ var folders = {
 
 /* ---------- Scripts ---------- */
 
-gulp.task('jshint', function () {
+gulp.task('eslint', () => {
   return gulp.src(basePaths.src + folders.scripts + '/**/*.{js,jsx}')
     .pipe($.plumber(notify))
-    .pipe($.react())
-    .pipe($.jshint())
-    .pipe($.jshint.reporter('jshint-stylish'))
-    .pipe($.jshint.reporter('fail'));
+    .pipe($.eslint())
+    .pipe($.eslint.format())
+    .pipe($.eslint.failAfterError());
 });
 
 function getCommonScriptsTransform (opts) {
   return browserify({
-    entries: [basePaths.src + folders.scripts + '/app.jsx'],
+    entries: [basePaths.src + folders.scripts + '/index.jsx'],
     debug: opts.debug
-  }).transform('reactify')
-    .transform('babelify', {stage: 1})
-    .bundle();
+  }).transform('babelify', {
+    presets: ['es2015', 'react'],
+    plugins: ['transform-object-rest-spread']
+  }).bundle();
 }
 
-gulp.task('scripts:dev', ['jshint'], function () {
+gulp.task('scripts:dev', ['eslint'], () => {
   return getCommonScriptsTransform({debug: true})
-    .on('error', function (error) {
+    .on('error', error => {
       notify(error);
       this.emit('end');
     })
@@ -61,7 +62,7 @@ gulp.task('scripts:dev', ['jshint'], function () {
     .pipe($.livereload());
 });
 
-gulp.task('scripts:prod', ['jshint'], function () {
+gulp.task('scripts:prod', ['eslint'], () => {
   return getCommonScriptsTransform({debug: false})
     .pipe(source('app.js'))
     .pipe(buffer())
@@ -73,11 +74,17 @@ gulp.task('scripts:prod', ['jshint'], function () {
 
 /* ---------- Styles ---------- */
 
-var autoprefixerOptions = {
-  browsers: ['last 2 iOS versions', 'last 5 Android versions', 'last 2 Chrome versions']
+const autoprefixerOptions = {
+  browsers: [
+    'last 2 iOS versions',
+    'last 5 Android versions',
+    'last 2 Chrome versions',
+    'last 2 Firefox versions',
+    'last 2 Safari versions',
+    'Explorer >= 10']
 };
 
-gulp.task('styles:dev', function () {
+gulp.task('styles:dev', () => {
   return gulp.src(basePaths.src + folders.styles + '/main.scss')
     .pipe($.plumber(notify))
     .pipe($.sourcemaps.init())
@@ -88,11 +95,11 @@ gulp.task('styles:dev', function () {
     .pipe($.livereload());
 });
 
-gulp.task('styles:prod', function () {
+gulp.task('styles:prod', () => {
   return gulp.src(basePaths.src + folders.styles + '/main.scss')
     .pipe($.sass())
     .pipe($.autoprefixer(autoprefixerOptions))
-    .pipe($.minifyCss())
+    .pipe($.cssnano())
     .pipe(gulp.dest(basePaths.dest + folders.styles));
 });
 
@@ -100,24 +107,24 @@ gulp.task('styles:prod', function () {
 
 /* ---------- Images ---------- */
 
-gulp.task('images:dev', function () {
-  return gulp.src(basePaths.src + folders.images + '**/*')
-    .pipe(gulp.dest(basePaths.dest))
+gulp.task('images:dev', () => {
+  return gulp.src(basePaths.src + folders.images + '/**/*')
+    .pipe(gulp.dest(basePaths.dest + folders.images))
     .pipe($.livereload());
 });
 
-gulp.task('images:prod', function () {
-  return gulp.src(basePaths.src + folders.images + '**/*')
+gulp.task('images:prod', () => {
+  return gulp.src(basePaths.src + folders.images + '/**/*')
     .pipe($.imagemin())
-    .pipe(gulp.dest(basePaths.dest));
+    .pipe(gulp.dest(basePaths.dest + folders.images));
 });
 
 
 
 /* ---------- Html ---------- */
 
-gulp.task('html', function () {
-  return gulp.src(basePaths.src + 'index.html')
+gulp.task('html', () => {
+  return gulp.src(basePaths.src + '/*.html')
     .pipe(gulp.dest(basePaths.dest))
     .pipe($.livereload());
 });
@@ -126,13 +133,13 @@ gulp.task('html', function () {
 
 /* ---------- Gulpfile ---------- */
 
-gulp.task('gulpfile', function () {
+gulp.task('gulpfile', () => {
   gulp.src('./gulpfile.js')
     .pipe($.plumber(notify))
-    .pipe($.jshint())
-    .pipe($.jshint.reporter('jshint-stylish'))
-    .pipe($.jshint.reporter('fail'));
-  });
+    .pipe($.eslint())
+    .pipe($.eslint.format())
+    .pipe($.eslint.failAfterError());
+});
 
 
 
@@ -145,7 +152,7 @@ gulp.task('build:dev', [
   'html'
 ]);
 
-gulp.task('connect:dev', ['build:dev'], function () {
+gulp.task('connect:dev', ['build:dev'], () => {
   $.connect.server({
     root: basePaths.dest,
     host: '0.0.0.0',
@@ -154,26 +161,26 @@ gulp.task('connect:dev', ['build:dev'], function () {
   });
 });
 
-gulp.task('watch', ['connect:dev'], function () {
+gulp.task('watch', ['connect:dev'], () => {
   $.livereload.listen();
 
-  $.watch(basePaths.src + folders.scripts + '/**/*.{js,jsx}', function () {
+  $.watch(basePaths.src + folders.scripts + '/**/*.{js,jsx}', () => {
     gulp.start('scripts:dev');
   });
 
-  $.watch(basePaths.src + folders.styles + '/**/*.scss', function () {
+  $.watch(basePaths.src + folders.styles + '/**/*.scss', () => {
     gulp.start('styles:dev');
   });
 
-  $.watch(basePaths.src + folders.images + '/**/*', function () {
+  $.watch(basePaths.src + folders.images + '/**/*', () => {
     gulp.start('images:dev');
   });
 
-  $.watch(basePaths.src + 'index.html', function () {
+  $.watch(basePaths.src + '/*.html', () => {
     gulp.start('html');
   });
 
-  $.watch('./gulpfile.js', function () {
+  $.watch('./gulpfile.js', () => {
     gulp.start('gulpfile');
   });
 });
@@ -186,12 +193,13 @@ gulp.task('default', [
 
 /* ---------- Prod: build & serve ---------- */
 
-gulp.task('clean:dist', function () {
-  return gulp.src(basePaths.dest)
-    .pipe($.clean());
+gulp.task('clean:dist', () => {
+  return del([
+    basePaths.dest + '**/*'
+  ]);
 });
 
-gulp.task('build:prod', function (callback) {
+gulp.task('build:prod', callback => {
   runSequence(
     'clean:dist',
     [
@@ -204,7 +212,7 @@ gulp.task('build:prod', function (callback) {
   );
 });
 
-gulp.task('connect:prod', ['build:prod'], function () {
+gulp.task('connect:prod', ['build:prod'], () => {
   $.connect.server({
     root: basePaths.dest,
     host: '0.0.0.0',
