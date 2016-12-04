@@ -2,17 +2,18 @@
 root: true
 
 env:
-  es6: true
   browser: true
   node: true
 
 plugins:
   - react
 
-ecmaFeatures:
-  jsx: true
-  modules: true
-  experimentalObjectRestSpread: true
+parserOptions:
+  ecmaVersion: 6
+  sourceType: module
+  ecmaFeatures:
+    jsx: true
+    experimentalObjectRestSpread: true
 
 rules:
   brace-style: [2, 1tbs, {allowSingleLine: false}]
@@ -24,6 +25,7 @@ rules:
   indent: [2, 2, {SwitchCase: 0}]
   jsx-quotes: [2, prefer-double]
   key-spacing: 2
+  keyword-spacing: 2
   max-len: 0 # TODO
   no-unused-expressions: 2
   no-unused-vars: 2
@@ -46,23 +48,21 @@ rules:
   quotes: [2, single, avoid-escape]
   semi-spacing: 2
   semi: [2, always]
-  space-after-keywords: [2, always]
   space-before-blocks: [2, always]
   space-before-function-paren: [2, always]
-  space-before-keywords: [2, always]
   space-infix-ops: 2
-  space-return-throw-case: 2
   space-unary-ops: [2, { words: true, nonwords: false }]
 
   # React
-  react/display-name: [2, {acceptTranspilerName: true}]
+  react/display-name: 2
   react/jsx-curly-spacing: 2
   react/jsx-indent-props: 2
   react/jsx-max-props-per-line: 2
   react/jsx-no-duplicate-props: 2
   react/jsx-no-undef: 2
-  react/jsx-sort-prop-types: 2
   react/jsx-uses-react: 2
+  react/jsx-uses-vars: 2
+  react/jsx-wrap-multilines: 2
   react/no-danger: 2
   react/no-did-mount-set-state: 2
   react/no-did-update-set-state: 2
@@ -73,4 +73,4 @@ rules:
   react/react-in-jsx-scope: 2
   react/require-extension: 0 # TODO
   react/sort-comp: 2
-  react/wrap-multilines: 2
+  react/sort-prop-types: 2

@@ -55,6 +55,10 @@ module.exports = yeoman.Base.extend({
         this.destinationPath('src/scripts/components/app.jsx'),
         {projectName: this.projectName}
       );
+      this.fs.copy(
+        this.templatePath('src/images/_favicon.ico'),
+        this.destinationPath('src/images/favicon.ico')
+      );
     }
   },
   install: function () {
