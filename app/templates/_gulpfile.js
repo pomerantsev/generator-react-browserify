@@ -44,10 +44,7 @@ function getCommonScriptsTransform (opts) {
   return browserify({
     entries: [basePaths.src + folders.scripts + '/index.jsx'],
     debug: opts.debug
-  }).transform('babelify', {
-    presets: ['es2015', 'react'],
-    plugins: ['transform-object-rest-spread']
-  }).bundle();
+  }).transform('babelify').bundle();
 }
 
 gulp.task('scripts:dev', ['eslint'], () => {
@@ -76,12 +73,10 @@ gulp.task('scripts:prod', ['eslint'], () => {
 
 const autoprefixerOptions = {
   browsers: [
-    'last 2 iOS versions',
-    'last 5 Android versions',
-    'last 2 Chrome versions',
-    'last 2 Firefox versions',
-    'last 2 Safari versions',
-    'Explorer >= 10']
+    '> 1%',
+    'last 2 versions',
+    'not ie <= 11'
+  ]
 };
 
 gulp.task('styles:dev', () => {
