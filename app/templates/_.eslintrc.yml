@@ -18,7 +18,7 @@ rules:
   computed-property-spacing: [2, never]
   eqeqeq: [2, smart]
   eol-last: 2
-  indent: [2, 2, {SwitchCase: 0}]
+  indent: [2, 2, {SwitchCase: 1, ignoredNodes: ["JSXElement *"]}]
   jsx-quotes: [2, prefer-double]
   key-spacing: 2
   keyword-spacing: 2
