@@ -4,11 +4,10 @@ For development and production use.
 Features
 --------
 * Use react (optional) and browserify
-* use ES6 (provided by the babel compiler and its polyfill);
 * write stylesheets in Sass;
 * forget about vendor prefixes (uses Autoprefixer with the `last 2 versions` option);
 * rebuilds scripts and styles when source files change, and automatically reloads the page in the browser (livereload);
-* sourcemaps: debug your original JSX / ES6 and Sass source files in the browser.
+* sourcemaps: debug your original JSX and Sass source files in the browser.
 
 How to use
 ----------
